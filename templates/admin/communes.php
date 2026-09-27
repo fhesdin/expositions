@@ -8,7 +8,7 @@
         <?php foreach ($rows as $c): ?>
             <tr>
                 <td class="small"><?= e($c['code_insee']) ?></td>
-                <td class="small"><?= e($c['postal_code']) ?></td>
+                <td class="small"><?= e($c['code_postal'] ?? '') ?></td>
                 <td><b><?= e($c['nom']) ?></b></td>
                 <td class="small"><?= e($c['latitude'] ?? '—') ?></td>
                 <td class="small"><?= e($c['longitude'] ?? '—') ?></td>
