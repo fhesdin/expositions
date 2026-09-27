@@ -1,0 +1,22 @@
+# Secrets et environnement local
+.env
+
+# Fichiers uploadés (posters, images, docs)
+uploads/
+data/uploads/
+
+# Logs et cache
+logs/
+*.log
+cache/
+var/
+
+# OS / éditeurs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# debug
+scripts/debug_*.php
