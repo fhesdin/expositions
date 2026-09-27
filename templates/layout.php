@@ -31,6 +31,7 @@ $pendingCount = ($currentUser !== null && \Core\Auth::isModerator())
     <link rel="stylesheet" href="css/style.css">
     <?php if (!empty($leaflet)): ?>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <?php endif; ?>
 </head>
 <body>
@@ -121,9 +122,6 @@ $pendingCount = ($currentUser !== null && \Core\Auth::isModerator())
     </div>
 </footer>
 
-<?php if (!empty($leaflet)): ?>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<?php endif; ?>
 <script src="js/app.js"></script>
 </body>
 </html>

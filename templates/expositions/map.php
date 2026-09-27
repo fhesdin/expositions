@@ -22,7 +22,7 @@
     };
 
     fetch('?r=/carte/data.json', { headers: { 'Accept': 'application/json' } })
-        .then(function (r) { return r.json(); })
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(function (data) {
             var legend = {};
             (data.places || []).forEach(function (p) {
@@ -41,5 +41,9 @@
                 s.innerHTML = '<span class="dot" style="display:inline-block;width:.8em;height:.8em;border-radius:50%;background:' + legend[t] + ';margin-right:.3em"></span>' + t;
                 lg.appendChild(s);
             });
+        })
+        .catch(function (err) {
+            var lg = document.getElementById('map-legend');
+            if (lg) lg.textContent = "Impossible de charger les données de la carte (" + err.message + ").";
         });
 })();
