@@ -23,6 +23,7 @@ return function (Router $r): void {
     $r->get('/recherche/suggest.json', [HomeController::class, 'searchSuggest'], 'search.suggest');
     $r->get('/carte/data.json', [HomeController::class, 'mapData'], 'map.data');
     $r->get('/carte', [\App\Expositions\MapController::class, 'index'], 'map');
+    $r->get('/page/{slug}', [\App\PagesController::class, 'show'], 'page');
     $r->get('/calendrier', [CalendarController::class, 'month'], 'calendar');
 
     // --- Authentification ---

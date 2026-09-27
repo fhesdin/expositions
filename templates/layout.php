@@ -39,7 +39,7 @@ $pendingCount = ($currentUser !== null && \Core\Auth::isModerator())
         <a class="brand" href="?r=/"><span class="dot"></span>expositions<em style="font-style:normal;color:var(--c-primary)">.top</em></a>
         <nav class="main-nav">
             <a href="?r=/expositions">Expositions</a>
-            <a href="?r=/expositions%2Fcarte">Carte</a>
+            <a href="?r=/carte">Carte</a>
             <a href="?r=/calendrier">Calendrier</a>
             <a href="?r=/lieux">Lieux</a>
             <a href="?r=/artistes">Artistes</a>
@@ -95,7 +95,7 @@ $pendingCount = ($currentUser !== null && \Core\Auth::isModerator())
             <h4>Explorer</h4>
             <ul>
                 <li><a href="?r=/expositions">Toutes les expositions</a></li>
-                <li><a href="?r=/expositions%3Fperiod%3Dweek-end">Ce week-end</a></li>
+                <li><a href="?r=/expositions&period=week-end">Ce week-end</a></li>
                 <li><a href="?r=/lieux">Annuaire des lieux</a></li>
                 <li><a href="?r=/artistes">Annuaire des artistes</a></li>
             </ul>
