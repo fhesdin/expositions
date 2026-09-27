@@ -5,8 +5,9 @@
 $isEdit = $row !== null;
 $ferr = fn(string $k) => !empty($errors[$k]) ? '<div class="field-error">' . e($errors[$k]) . '</div>' : '';
 ?>
-<form method="post" class="form-card" enctype="multipart/form-data">
+<form method="post" class="form-card" enctype="multipart/form-data" action="<?= $isEdit ? '?r=/expositions/' . (int) $row['id'] . '/edit' : '?r=/expositions/create' ?>">
     <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
+    <?php if ($isEdit): ?><input type="hidden" name="current_slug" value="<?= e($row['slug']) ?>"><?php endif; ?>
 
     <fieldset class="form-section">
         <legend>Essentiel</legend>

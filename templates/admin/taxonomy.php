@@ -34,6 +34,11 @@
 
 <section class="section">
     <h2>Tags (<?= count($tags) ?>)</h2>
+    <form method="post" action="?r=/admin/taxonomy/tags/create" class="filter-bar">
+        <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
+        <div><label>Nouveau tag</label><input type="text" name="name" maxlength="80" required></div>
+        <button class="btn btn-primary btn-sm" type="submit">Ajouter</button>
+    </form>
     <form method="post" action="?r=/admin/taxonomy/tags/merge" class="filter-bar">
         <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
         <div><label>Fusionner le tag (id)</label><input type="number" name="from_id" required></div>
@@ -49,12 +54,26 @@
                     <td><?= e($t['name']) ?></td>
                     <td><?= (int) $t['used'] ?></td>
                     <td><?= $t['is_approved'] ? '<span class="badge encours">approuvé</span>' : '<span class="badge nouveau">à valider</span>' ?></td>
-                    <td><?php if (!$t['is_approved']): ?>
+                    <td class="actions">
+                        <?php if (!$t['is_approved']): ?>
                         <form method="post" action="?r=/admin/taxonomy/tags/<?= (int) $t['id'] ?>/approve">
                             <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
                             <button class="btn btn-sm btn-primary" type="submit">Approuver</button>
                         </form>
-                    <?php endif; ?></td>
+                        <?php endif; ?>
+                        <details>
+                            <summary class="btn btn-sm btn-outline">Renommer</summary>
+                            <form method="post" action="?r=/admin/taxonomy/tags/<?= (int) $t['id'] ?>/edit" class="filter-bar">
+                                <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
+                                <input type="text" name="name" value="<?= e($t['name']) ?>" maxlength="80" required>
+                                <button class="btn btn-sm btn-primary" type="submit">Enregistrer</button>
+                            </form>
+                        </details>
+                        <form method="post" action="?r=/admin/taxonomy/tags/<?= (int) $t['id'] ?>/delete" data-confirm="Supprimer ce tag ? Les liaisons seront perdues.">
+                            <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
+                            <button class="btn btn-sm btn-danger" type="submit">Supprimer</button>
+                        </form>
+                    </td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

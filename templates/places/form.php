@@ -2,8 +2,9 @@
 $isEdit = $row !== null;
 $ferr = fn(string $k) => !empty($errors[$k]) ? '<div class="field-error">' . e($errors[$k]) . '</div>' : '';
 ?>
-<form method="post" class="form-card">
+<form method="post" class="form-card" action="<?= $isEdit ? '?r=/lieux/' . (int) $row['id'] . '/edit' : '?r=/lieux/create' ?>">
     <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
+    <input type="hidden" name="current_slug" value="<?= e($row['slug'] ?? '') ?>">
     <div class="form-grid cols-2">
         <div class="field" style="grid-column:1/-1">
             <label>Nom du lieu *</label>

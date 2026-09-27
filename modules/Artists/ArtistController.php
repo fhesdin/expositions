@@ -178,7 +178,8 @@ final class ArtistController
             'workshop_open' => (bool) Request::input('workshop_open') ? 1 : 0,
             'workshop_info' => trim((string) Request::input('workshop_info')),
         ];
-        $data['slug'] = $this->uniqueSlug($name);
+        $current = trim((string) Request::input('current_slug'));
+        $data['slug'] = $current !== '' ? $current : $this->uniqueSlug($name);
         return [$data, $errors];
     }
 

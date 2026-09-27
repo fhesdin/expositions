@@ -54,32 +54,29 @@ final class Image
     {
         $thumb = preg_replace('/\.' . preg_quote($ext, '/') . '$/', '_thumb.' . $ext, $path);
 
-        if (function_exists('imagecreatefromjpeg')) {
-            $src = match ($ext) {
-                'jpg' => @imagecreatefromjpeg($path),
-                'png' => @imagecreatefrompng($path),
-                'webp' => @imagecreatefromwebp($path),
-                default => null,
-            };
-            if (!$src) {
-                return null;
-            }
-            $w = imagesx($src);
-            $h = imagesy($src);
-            $tw = 300;
-            $th = (int) ($h * $tw / $w);
-            $dst = imagecreatetruecolor($tw, $th);
-            imagecopyresampled($dst, $src, 0, 0, 0, 0, $tw, $th, $w, $h);
-            match ($ext) {
-                'jpg' => imagejpeg($dst, $thumb, 85),
-                'png' => imagepng($dst, $thumb),
-                'webp' => imagewebp($dst, $thumb, 85),
-            };
-            imagedestroy($src);
-            imagedestroy($dst);
-            return $thumb;
+        $src = match ($ext) {
+            'jpg' => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($path) : null,
+            'png' => @imagecreatefrompng($path),
+            'webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($path) : null,
+            default => null,
+        };
+        if (!$src) {
+            return null;
         }
-        return null;
+        $w = imagesx($src);
+        $h = imagesy($src);
+        $tw = 300;
+        $th = (int) ($h * $tw / $w);
+        $dst = imagecreatetruecolor($tw, $th);
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $tw, $th, $w, $h);
+        match ($ext) {
+            'jpg' => function_exists('imagejpeg') ? imagejpeg($dst, $thumb, 85) : null,
+            'png' => imagepng($dst, $thumb),
+            'webp' => function_exists('imagewebp') ? imagewebp($dst, $thumb, 85) : null,
+        };
+        imagedestroy($src);
+        imagedestroy($dst);
+        return $thumb;
     }
 
     public static function delete(string $path): void

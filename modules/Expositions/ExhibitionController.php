@@ -55,6 +55,7 @@ final class ExhibitionController
         View::render('expositions/show', [
             'title' => $row['title'],
             'expo' => $row,
+            'poster' => !empty($row['poster_path']) ? '/uploads/expositions/' . $row['poster_path'] : null,
             'artists' => ExhibitionModel::artists((int) $row['id']),
             'tags' => ExhibitionModel::tags((int) $row['id']),
             'images' => ExhibitionModel::images((int) $row['id']),
@@ -88,11 +89,16 @@ final class ExhibitionController
             Response::forbidden('Jeton CSRF invalide.');
         }
         [$data, $errors] = $this->validateAndCollect();
+        $posterFile = Request::file('poster');
+        if ($posterFile !== null && $posterFile['error'] !== UPLOAD_ERR_OK) {
+            $errors['poster'] = 'Envoi de l\u2019affiche impossible (code ' . $posterFile['error'] . ').';
+        }
         if ($errors !== []) {
             $this->renderForm(null, $data, $errors);
             return;
         }
         $id = $this->persist(null, $data);
+        $this->savePoster($id, $posterFile, $data['poster_credit'] ?? null);
         $finalStatus = $this->publicationStatus();
         Session::flash('success', 'Exposition enregistrée. Elle est ' . ($finalStatus === 'published' ? 'en ligne' : 'en attente de modération') . '.');
         Response::redirect('/expositions/' . $data['slug']);
@@ -133,6 +139,7 @@ final class ExhibitionController
                 || (int) $data['place_id'] !== (int) $row['place_id']
             );
         $id = $this->persist((int) $row['id'], $data, $backToModeration);
+        $this->savePoster((int) ($id ?? $row['id']), Request::file('poster'), $data['poster_credit'] ?? null);
         ModLog::log('update', 'exhibition', (int) ($id ?? $row['id']), $backToModeration ? 'retour en modération' : null);
         Session::flash('success', 'Exposition mise à jour.');
         Response::redirect('/expositions/' . $data['slug']);
@@ -448,10 +455,33 @@ final class ExhibitionController
         $data['_new_tags'] = $flatList(Request::input('new_tags', []));
         $data['_public_ids'] = array_values(array_filter(array_map('intval', (array) Request::input('public_ids', []))));
 
-        // slug
-        $data['slug'] = $this->uniqueSlug($title);
+        // slug : conservé en édition (champ caché), généré à la création
+        $current = trim((string) Request::input('current_slug'));
+        $data['slug'] = $current !== '' ? $current : $this->uniqueSlug($title);
 
         return [$data, $errors];
+    }
+
+    /** Enregistre l'affiche uploadée (remplace l'ancienne) et met à jour poster_path. */
+    private function savePoster(int $exhibitionId, ?array $file, ?string $credit = null): void
+    {
+        if ($file === null || $file['error'] === UPLOAD_ERR_NO_FILE) {
+            if ($credit !== null && $credit !== '') {
+                \Core\Database::run('UPDATE exhibitions SET poster_credit = ? WHERE id = ?', [$credit ?: null, $exhibitionId]);
+            }
+            return;
+        }
+        $dir = dirname(__DIR__, 2) . '/uploads/expositions';
+        $name = \Core\Image::upload($file, $dir, 5, true);
+        $old = \Core\Database::run('SELECT poster_path FROM exhibitions WHERE id = ?', [$exhibitionId])->fetchColumn();
+        if ($old && is_file($dir . '/' . $old)) {
+            @unlink($dir . '/' . $old);
+            $thumb = preg_replace('/(\.[a-z0-9]+)$/i', '_thumb$1', (string) $old);
+            if ($thumb && is_file($dir . '/' . $thumb)) {
+                @unlink($dir . '/' . $thumb);
+            }
+        }
+        \Core\Database::run('UPDATE exhibitions SET poster_path = ?, poster_credit = ? WHERE id = ?', [$name, $credit ?: null, $exhibitionId]);
     }
 
     private function persist(?int $id, array $data, bool $backToModeration = false): int

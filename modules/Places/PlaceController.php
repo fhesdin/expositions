@@ -168,7 +168,8 @@ final class PlaceController
             'email' => trim((string) Request::input('email')),
             'website' => trim((string) Request::input('website')),
         ];
-        $data['slug'] = $this->uniqueSlug($name);
+        $current = trim((string) Request::input('current_slug'));
+        $data['slug'] = $current !== '' ? $current : $this->uniqueSlug($name);
         return [$data, $errors];
     }
 

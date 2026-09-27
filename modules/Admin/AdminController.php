@@ -163,6 +163,57 @@ final class AdminController
         Response::redirect('/moderation');
     }
 
+    public function tagStore(array $params = []): void
+    {
+        if (!Csrf::check()) {
+            Response::forbidden('Jeton CSRF invalide.');
+        }
+        $name = trim((string) Request::input('name'));
+        if ($name !== '' && mb_strlen($name) <= 80) {
+            try {
+                Database::run(
+                    'INSERT INTO tags (slug, name, is_approved) VALUES (?, ?, 1)',
+                    [slugify($name), $name]
+                );
+                ModLog::log('create', 'tag', null, $name);
+                Session::flash('success', 'Tag ajouté.');
+            } catch (\PDOException) {
+                Session::flash('error', 'Ce tag existe déjà.');
+            }
+        }
+        Response::redirect('/admin/taxonomy');
+    }
+
+    public function tagUpdate(array $params = []): void
+    {
+        if (!Csrf::check()) {
+            Response::forbidden('Jeton CSRF invalide.');
+        }
+        $id = (int) ($params['id'] ?? 0);
+        $name = trim((string) Request::input('name'));
+        if ($id > 0 && $name !== '' && mb_strlen($name) <= 80) {
+            Database::run('UPDATE tags SET name = ?, slug = ? WHERE id = ?', [$name, slugify($name), $id]);
+            ModLog::log('update', 'tag', $id, $name);
+            Session::flash('success', 'Tag renommé.');
+        }
+        Response::redirect('/admin/taxonomy');
+    }
+
+    public function tagDelete(array $params = []): void
+    {
+        if (!Csrf::check()) {
+            Response::forbidden('Jeton CSRF invalide.');
+        }
+        $id = (int) ($params['id'] ?? 0);
+        if ($id > 0) {
+            Database::run('DELETE FROM exhibition_tags WHERE tag_id = ?', [$id]);
+            Database::run('DELETE FROM tags WHERE id = ?', [$id]);
+            ModLog::log('delete', 'tag', $id);
+            Session::flash('success', 'Tag supprimé.');
+        }
+        Response::redirect('/admin/taxonomy');
+    }
+
     // ------------------------------------------------------------ settings & stats
 
     public function settings(array $params = []): void
