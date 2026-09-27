@@ -96,8 +96,14 @@ $mc = fn(array $a) => '<form method="post" class="mod-actions" action="' . e($a[
     <h2>💡 Suggestions (<?= count($suggestions) ?>)</h2>
     <?php foreach ($suggestions as $s): ?>
         <div class="mod-card">
-            <div class="title"><?= e($s['kind']) ?> #<?= (int) $s['item_id'] ?></div>
-            <div class="meta"><?= e($s['content']) ?></div>
+            <div class="title"><?= $s['kind'] === 'missing_expo' ? 'Exposition manquante' : 'Erreur signalée' ?></div>
+            <div class="meta">
+                <?php if (!empty($s['title'])): ?><strong><?= e($s['title']) ?></strong> — <?php endif; ?>
+                <?php if (!empty($s['place_name'])): ?><?= e($s['place_name']) ?><?php if (!empty($s['commune'])): ?> (<?= e($s['commune']) ?>)<?php endif; ?> — <?php endif; ?>
+                <?php if (!empty($s['dates'])): ?><?= e($s['dates']) ?> — <?php endif; ?>
+                <?php if (!empty($s['message'])): ?><?= e($s['message']) ?><?php endif; ?>
+                <?php if (!empty($s['email'])): ?><br><span class="muted small">Contact : <?= e($s['email']) ?></span><?php endif; ?>
+            </div>
             <div class="mod-actions">
                 <?= $mc(['action' => '?r=/moderation/suggestions/' . (int) $s['id'] . '/resolve', 'label' => 'Traité', 'class' => 'btn-primary']) ?>
                 <?= $mc(['action' => '?r=/moderation/suggestions/' . (int) $s['id'] . '/resolve', 'label' => 'Ignorer', 'class' => 'btn-outline', 'hidden' => ['<input type="hidden" name="action" value="dismiss">']]) ?>
@@ -117,7 +123,7 @@ $mc = fn(array $a) => '<form method="post" class="mod-actions" action="' . e($a[
                     <td class="small"><?= e($j['created_at']) ?></td>
                     <td><?= e($j['username'] ?? '?') ?></td>
                     <td><?= e($j['action']) ?></td>
-                    <td><?= e($j['kind']) ?> #<?= (int) $j['item_id'] ?></td>
+                    <td><?= e($j['kind'] ?? '?') ?><?= !empty($j['item_id']) ? ' #' . (int) $j['item_id'] : '' ?></td>
                     <td class="small muted"><?= e($j['details'] ?? '') ?></td>
                 </tr>
             <?php endforeach; ?>
