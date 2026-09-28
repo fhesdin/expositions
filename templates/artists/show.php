@@ -15,6 +15,12 @@ $canEdit = \Core\Auth::check() && (\Core\Auth::isModerator() || (int) ($artist['
         <?php if ($artist['workshop_open']): ?><span class="badge gratuit">Atelier ouvert au public</span><?php endif; ?>
     </p>
     </div>
+    <?php if ($canEdit): ?>
+    <form method="post" action="?r=/artistes/<?= (int) $artist['id'] ?>/delete" onsubmit="return confirm('Supprimer définitivement l\'artiste « <?= e($artist['name']) ?> » ? Ses œuvres et ses participations seront détachées.')">
+        <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
+        <button class="btn btn-danger btn-sm" type="submit">🗑 Supprimer</button>
+    </form>
+    <?php endif; ?>
 </div>
 
 <?php if (!empty($artist['bio'])): ?>

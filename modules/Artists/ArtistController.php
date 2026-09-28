@@ -126,6 +126,31 @@ final class ArtistController
         Response::redirect('/artistes/' . $data['slug']);
     }
 
+    public function delete(array $params = []): void
+    {
+        if (!Csrf::check()) {
+            Response::forbidden('Jeton CSRF invalide.');
+        }
+        $row = ArtistModel::find($params['id'] ?? 0);
+        if ($row === null) {
+            Response::notFound();
+        }
+        $this->assertCanEdit($row);
+        // nettoyer la photo
+        if (!empty($row['image_path'])) {
+            $dir = \dirname(__DIR__, 2) . '/uploads/artists';
+            foreach ([$row['image_path'], preg_replace('/\\.(jpg|jpeg|png)$/i', '_thumb.$1', $row['image_path'])] as $f) {
+                if (is_file($dir . '/' . $f)) {
+                    @unlink($dir . '/' . $f);
+                }
+            }
+        }
+        Database::run('DELETE FROM artists WHERE id = ?', [(int) $row['id']]);
+        ModLog::log('delete', 'artist', (int) $row['id'], $row['name']);
+        Session::flash('success', 'Artiste « ' . $row['name'] . ' » supprimé.');
+        Response::redirect('/artistes');
+    }
+
     /** Revendication d'une page artiste (membre → lier son compte). */
     public function claim(array $params = []): void
     {

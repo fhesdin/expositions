@@ -84,6 +84,7 @@ return function (Router $r): void {
     $r->post('/artistes/{id}/claim', [ArtistController::class, 'claim'])->middleware('auth');
     $r->get('/artistes/{id}/edit', [ArtistController::class, 'edit'])->middleware('auth');
     $r->post('/artistes/{id}/edit', [ArtistController::class, 'update'])->middleware('auth');
+    $r->post('/artistes/{id}/delete', [ArtistController::class, 'delete'])->middleware('auth');
     $r->get('/artistes/{slug}', [ArtistController::class, 'show'], 'artists.show');
 
     // --- Modération ---

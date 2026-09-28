@@ -66,3 +66,9 @@ $ferr = fn(string $k) => !empty($errors[$k]) ? '<div class="field-error">' . e($
         <a class="btn btn-outline" href="<?= $isEdit ? '?r=/artistes/' . e($row['slug']) : '?r=/artistes' ?>">Annuler</a>
     </div>
 </form>
+<?php if ($isEdit && (\Core\Auth::isModerator() || (int) ($row['user_id'] ?? 0) === \Core\Auth::id())): ?>
+<form method="post" action="?r=/artistes/<?= (int) $row['id'] ?>/delete" onsubmit="return confirm('Supprimer définitivement cet artiste ?')">
+    <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
+    <button class="btn btn-danger" type="submit">🗑 Supprimer définitivement cet artiste</button>
+</form>
+<?php endif; ?>
