@@ -1,7 +1,10 @@
 <?php /** Artistes : annuaire */ ?>
 <div class="page-head">
     <h1>Les artistes</h1>
-    <p class="sub">Peintres, photographes, sculpteurs… exposés dans la Somme. <?php if (\Core\Auth::check()): ?><a href="?r=/artistes/create">Créer ma page →</a><?php endif; ?></p>
+    <p class="sub">Peintres, photographes, sculpteurs… exposés dans la Somme.</p>
+    <?php if (\Core\Auth::check()): ?>
+    <p><a class="btn btn-primary" href="?r=/artistes/create">➕ Créer une fiche artiste</a></p>
+    <?php endif; ?>
 </div>
 
 <form method="get" class="filter-bar">
