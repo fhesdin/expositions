@@ -7,7 +7,7 @@
 </div>
 <?php endif; ?>
 
-<form method="post" class="form-card" action="<?= $isEdit ? '?r=/structures/' . (int) $row['id'] . '/edit' : '?r=/structures/create' ?>">
+<form method="post" enctype="multipart/form-data" class="form-card" action="<?= $isEdit ? '?r=/structures/' . (int) $row['id'] . '/edit' : '?r=/structures/create' ?>">
     <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
 
     <div><label>Nom de la structure *</label>
@@ -41,6 +41,13 @@
 
     <div><label>Téléphone</label>
         <input type="tel" name="phone" maxlength="30" value="<?= e($row['phone'] ?? '') ?>"></div>
+
+    <div><label>Logo (PNG/JPG, 3 Mo max)</label>
+        <input type="file" name="logo" accept="image/png,image/jpeg">
+        <?php if (!empty($row['logo_path'])): ?>
+        <div class="hint"><img src="/uploads/structures/<?= e($row['logo_path']) ?>" alt="Logo actuel" style="max-width:80px;vertical-align:middle"> Le remplacer par un nouveau fichier.</div>
+        <?php endif; ?>
+    </div>
 
     <button class="btn btn-primary" type="submit"><?= $isEdit ? 'Enregistrer' : 'Créer la structure' ?></button>
     <?php if (!$isEdit): ?>

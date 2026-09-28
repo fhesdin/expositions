@@ -27,6 +27,8 @@ final class PlaceController
             'filters' => $filters,
             'types' => PlaceModel::types(),
             'communes' => \App\Models\Commune::allOrdered(),
+            'myStructures' => \App\Models\StructureModel::ofUser(Auth::id()),
+            'canAllStructures' => Auth::isModerator(),
         ]);
     }
 
@@ -145,6 +147,8 @@ final class PlaceController
             'errors' => $errors,
             'types' => PlaceModel::types(),
             'communes' => \App\Models\Commune::allOrdered(),
+            'myStructures' => \App\Models\StructureModel::ofUser(Auth::id()),
+            'canAllStructures' => Auth::isModerator(),
         ]);
     }
 
@@ -168,6 +172,7 @@ final class PlaceController
             'phone' => trim((string) Request::input('phone')),
             'email' => trim((string) Request::input('email')),
             'website' => trim((string) Request::input('website')),
+            'structure_id' => (int) Request::input('structure_id') ?: null,
         ];
         $current = trim((string) Request::input('current_slug'));
         $data['slug'] = $current !== '' ? $current : $this->uniqueSlug($name);
@@ -190,6 +195,7 @@ final class PlaceController
             'phone' => $data['phone'] ?: null,
             'email' => $data['email'] ?: null,
             'website' => $data['website'] ?: null,
+            'structure_id' => $data['structure_id'] ?? null,
         ];
         $status = $this->publicationStatus();
         if ($id === null) {

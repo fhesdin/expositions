@@ -103,6 +103,7 @@ final class StructureController
         $data['slug'] = StructureModel::uniqueSlug($data['nom']);
         $data['status'] = $this->publicationStatus();
         $id = StructureModel::create($data, Auth::id());
+        $this->saveLogo($id, Request::file('logo'));
         Session::flash('success', 'Structure enregistrée. Elle est ' . ($data['status'] === 'published' ? 'en ligne' : 'en attente de modération') . '.');
         Response::redirect('/structures/' . $data['slug']);
     }
@@ -123,8 +124,23 @@ final class StructureController
             return;
         }
         StructureModel::update($id, $data);
+        $this->saveLogo($id, Request::file('logo'));
         Session::flash('success', 'Structure mise à jour.');
         Response::redirect('/structures/' . $row['slug']);
+    }
+
+    private function saveLogo(int $structureId, ?array $file): void
+    {
+        if ($file === null || $file['error'] === UPLOAD_ERR_NO_FILE) {
+            return;
+        }
+        $dir = __DIR__ . '/../uploads/structures';
+        $name = \Core\Image::upload($file, $dir, 3, false);
+        $old = \Core\Database::run('SELECT logo_path FROM structures WHERE id = ?', [$structureId])->fetchColumn();
+        if ($old && is_file($dir . '/' . $old)) {
+            @unlink($dir . '/' . $old);
+        }
+        \Core\Database::run('UPDATE structures SET logo_path = ? WHERE id = ?', [$name, $structureId]);
     }
 
     // ------------------------------------------------------------ membres

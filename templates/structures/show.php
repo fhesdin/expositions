@@ -1,8 +1,13 @@
 <?php /** Fiche publique structure */ ?>
-<div class="page-head">
+<div class="page-head" style="display:flex;align-items:center;gap:1rem">
+    <?php if (!empty($s['logo_path'])): ?>
+    <img src="/uploads/structures/<?= e($s['logo_path']) ?>" alt="Logo <?= e($s['nom']) ?>" style="width:64px;height:64px;object-fit:contain;border-radius:8px;background:#fff">
+    <?php endif; ?>
+    <div>
     <h1><?= e($s['nom']) ?><?= $s['status'] !== 'published' ? ' <span class="badge">en attente</span>' : '' ?></h1>
     <p class="sub"><?= e(\App\Models\StructureModel::TYPES[$s['type']] ?? $s['type']) ?>
         <?= $s['commune_name'] ? ' · ' . e($s['commune_name']) : '' ?></p>
+    </div>
 </div>
 
 <div class="form-card">

@@ -15,7 +15,7 @@ $ferr = fn(string $k) => !empty($errors[$k]) ? '<div class="field-error">' . e($
             <label>Type de lieu</label>
             <select name="type_id">
                 <option value="">—</option>
-                <?php foreach ($placeTypes as $t): ?>
+                <?php foreach (($types ?? []) as $t): ?>
                     <option value="<?= (int) $t['id'] ?>" <?= (string)($form['type_id'] ?? '') === (string)$t['id'] ? 'selected' : '' ?>><?= e($t['name']) ?></option>
                 <?php endforeach; ?>
             </select>
@@ -53,6 +53,17 @@ $ferr = fn(string $k) => !empty($errors[$k]) ? '<div class="field-error">' . e($
         <div class="field" style="grid-column:1/-1">
             <label>Site web</label>
             <input type="url" name="website" value="<?= e($form['website'] ?? '') ?>">
+        </div>
+        <div class="field" style="grid-column:1/-1">
+            <label>Structure</label>
+            <select name="structure_id">
+                <option value="">— aucune / indépendant —</option>
+                <?php foreach (($myStructures ?? []) as $st): ?>
+                    <?php if (($st['member_status'] ?? '') !== 'active' || !in_array($st['role'], ['contributor', 'admin'], true)) continue; ?>
+                    <option value="<?= (int) $st['id'] ?>" <?= (string)($form['structure_id'] ?? '') === (string)$st['id'] ? 'selected' : '' ?>><?= e($st['nom']) ?></option>
+                <?php endforeach; ?>
+            </select>
+            <div class="hint">Rattachez ce lieu à votre structure. <a href="?r=/structures/create" target="_blank">Créer une structure</a>.</div>
         </div>
         <div class="field">
             <label>Horaires</label>
