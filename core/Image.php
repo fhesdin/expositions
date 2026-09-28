@@ -37,7 +37,12 @@ final class Image
             mkdir($destDir, 0775, true);
         }
         $filename = uuid() . '.' . $ext;
-        $destPath = rtrim($destDir, '/\\') . DIRECTORY_SEPARATOR . $filename;
+        // realpath : évite les segments '..' dont move_uploaded_file (sel du noyau/AppArmor) refuse certains schémas
+        $destDirReal = realpath($destDir);
+        if ($destDirReal === false) {
+            throw new \RuntimeException('Dossier de destination inaccessible.');
+        }
+        $destPath = $destDirReal . DIRECTORY_SEPARATOR . $filename;
 
         if (!move_uploaded_file($file['tmp_name'], $destPath)) {
             throw new \RuntimeException('Impossible de déplacer le fichier uploadé.');
@@ -127,7 +132,12 @@ final class Image
             mkdir($destDir, 0775, true);
         }
         $filename = uuid() . '.' . $ext;
-        $destPath = rtrim($destDir, '/\\') . DIRECTORY_SEPARATOR . $filename;
+        // realpath : évite les segments '..' dont move_uploaded_file (sel du noyau/AppArmor) refuse certains schémas
+        $destDirReal = realpath($destDir);
+        if ($destDirReal === false) {
+            throw new \RuntimeException('Dossier de destination inaccessible.');
+        }
+        $destPath = $destDirReal . DIRECTORY_SEPARATOR . $filename;
         file_put_contents($destPath, $body);
 
         self::makeThumbnail($destPath, $ext);

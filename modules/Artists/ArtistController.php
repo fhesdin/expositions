@@ -224,7 +224,7 @@ final class ArtistController
         if ($file === null || $file['error'] === UPLOAD_ERR_NO_FILE) {
             return;
         }
-        $dir = __DIR__ . '/../uploads/artists';
+        $dir = \dirname(__DIR__, 2) . '/uploads/artists';
         $name = \Core\Image::upload($file, $dir, 3, false);
         $old = \Core\Database::run('SELECT image_path FROM artists WHERE id = ?', [$artistId])->fetchColumn();
         if ($old && is_file($dir . '/' . $old)) {
