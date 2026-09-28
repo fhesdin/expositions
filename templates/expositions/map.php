@@ -46,4 +46,4 @@
             var lg = document.getElementById('map-legend');
             if (lg) lg.textContent = "Impossible de charger les données de la carte (" + err.message + ").";
         });
-})();
+})();</script>
