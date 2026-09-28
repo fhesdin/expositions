@@ -113,6 +113,7 @@ return function (Router $r): void {
 
     // --- Admin ---
     $r->get('/admin/users', [AdminController::class, 'users'])->middleware('admin');
+    $r->post('/admin/users/create', [AdminController::class, 'userCreate'])->middleware('admin');
     $r->get('/admin/users/{id}/edit', [AdminController::class, 'userEdit'])->middleware('admin');
     $r->post('/admin/users/{id}/edit', [AdminController::class, 'userUpdate'])->middleware('admin');
     $r->get('/admin/taxonomy', [AdminController::class, 'taxonomy'])->middleware('admin');

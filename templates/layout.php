@@ -47,6 +47,7 @@ $pendingCount = ($currentUser !== null && \Core\Auth::isModerator())
             <a href="?r=/structures">Structures</a>
             <?php if ($currentUser === null): ?>
                 <a href="?r=/expositions%2Fpropose">Proposer une expo</a>
+                <a href="?r=/register">Inscription</a>
                 <a href="?r=/login">Connexion</a>
             <?php else: ?>
                 <?php if (\Core\Auth::isContributor() || \Core\Auth::isModerator()): ?>

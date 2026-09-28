@@ -52,6 +52,7 @@ final class AuthController
             'title' => 'Créer un compte',
             'form' => ['email' => '', 'username' => ''],
             'errors' => [],
+            'communes' => \App\Models\Commune::allOrdered(),
         ]);
     }
 
@@ -82,6 +83,7 @@ final class AuthController
                 'title' => 'Créer un compte',
                 'form' => ['email' => $email, 'username' => $username],
                 'errors' => $errors,
+                'communes' => \App\Models\Commune::allOrdered(),
             ]);
             return;
         }
@@ -92,6 +94,8 @@ final class AuthController
             'username' => $username,
             'password_hash' => password_hash((string) Request::input('password'), PASSWORD_DEFAULT),
             'role_id' => 2,
+            'commune_id' => (int) Request::input('commune_id') ?: null,
+            'profile_kind' => in_array((string) Request::input('profile_kind'), ['membre', 'artiste', 'lieu'], true) ? (string) Request::input('profile_kind') : 'membre',
             'confirm_token' => $token,
         ]);
 

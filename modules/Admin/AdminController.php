@@ -31,6 +31,50 @@ final class AdminController
         ]);
     }
 
+    public function userCreate(array $params = []): void
+    {
+        if (!Csrf::check()) {
+            Response::forbidden('Jeton CSRF invalide.');
+        }
+        $email = strtolower(trim((string) Request::input('email')));
+        $username = trim((string) Request::input('username'));
+        $password = (string) Request::input('password');
+        $roleId = (int) Request::input('role_id', 2);
+
+        $errors = [];
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'E-mail invalide.';
+        }
+        if (mb_strlen($username) < 3) {
+            $errors[] = 'Pseudonyme trop court (3 caractères min).';
+        }
+        if (mb_strlen($password) < 10) {
+            $errors[] = 'Mot de passe trop court (10 caractères min).';
+        }
+        if (UserModel::emailExists($email)) {
+            $errors[] = 'E-mail déjà utilisé.';
+        }
+        if (UserModel::usernameExists($username)) {
+            $errors[] = 'Pseudonyme déjà pris.';
+        }
+        if ($errors !== []) {
+            Session::flash('error', implode(' ', $errors));
+            Response::redirect('/admin/users');
+        }
+        $id = UserModel::create([
+            'email' => $email,
+            'username' => $username,
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+            'role_id' => $roleId,
+            'is_active' => 1,
+            'email_confirmed_at' => date('Y-m-d H:i:s'),
+            'commune_id' => (int) Request::input('commune_id') ?: null,
+        ]);
+        ModLog::log('user.create', 'user', $id, $username);
+        Session::flash('success', 'Utilisateur « ' . $username . ' » créé (compte confirmé, actif).');
+        Response::redirect('/admin/users');
+    }
+
     public function userEdit(array $params = []): void
     {
         $row = UserModel::find((int) ($params['id'] ?? 0));
