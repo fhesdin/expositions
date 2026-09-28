@@ -44,6 +44,7 @@ $pendingCount = ($currentUser !== null && \Core\Auth::isModerator())
             <a href="?r=/calendrier">Calendrier</a>
             <a href="?r=/lieux">Lieux</a>
             <a href="?r=/artistes">Artistes</a>
+            <a href="?r=/structures">Structures</a>
             <?php if ($currentUser === null): ?>
                 <a href="?r=/expositions%2Fpropose">Proposer une expo</a>
                 <a href="?r=/login">Connexion</a>
@@ -99,6 +100,7 @@ $pendingCount = ($currentUser !== null && \Core\Auth::isModerator())
                 <li><a href="?r=/expositions&period=week-end">Ce week-end</a></li>
                 <li><a href="?r=/lieux">Annuaire des lieux</a></li>
                 <li><a href="?r=/artistes">Annuaire des artistes</a></li>
+                <li><a href="?r=/structures">Annuaire des structures</a></li>
             </ul>
         </div>
         <div>

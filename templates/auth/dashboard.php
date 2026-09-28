@@ -45,6 +45,41 @@
 </section>
 <?php endif; ?>
 
+<?php if ($myStructures !== []): ?>
+<section class="section">
+    <h2>Mes structures</h2>
+    <ul>
+        <?php foreach ($myStructures as $st): ?>
+            <li>
+                <a href="?r=/structures/<?= e($st['slug']) ?>"><?= e($st['nom']) ?></a>
+                <?php if (($st['member_status'] ?? '') === 'pending'): ?>
+                    <span class="badge"><?= ($st['requested_by'] ?? '') === 'structure' ? 'invitation à confirmer' : 'demande en attente' ?></span>
+                <?php else: ?>
+                    <span class="muted small"><?= ['member' => 'membre', 'contributor' => 'contributeur', 'admin' => 'responsable'][$st['role']] ?? e($st['role']) ?></span>
+                <?php endif; ?>
+                <?php if (($st['member_status'] ?? '') === 'active' && in_array($st['role'], ['admin'], true)): ?>
+                    <a class="small" href="?r=/structures/<?= (int) $st['id'] ?>/members">(membres)</a>
+                    <a class="small" href="?r=/structures/<?= (int) $st['id'] ?>/edit">(modifier)</a>
+                <?php endif; ?>
+                <?php if (($st['member_status'] ?? '') === 'pending' && ($st['requested_by'] ?? '') === 'structure'): ?>
+                    <form method="post" action="?r=/structures/join" style="display:inline">
+                        <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
+                        <input type="hidden" name="structure_id" value="<?= (int) $st['id'] ?>">
+                        <button class="btn btn-sm btn-primary" type="submit">Accepter l'invitation</button>
+                    </form>
+                <?php endif; ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</section>
+<?php endif; ?>
+<?php if (Auth::minRank(3) && $myStructures === []): ?>
+<section class="section">
+    <h2>Structures</h2>
+    <p class="small muted">Vous n'êtes membre d'aucune structure. <a href="?r=/structures/create">Créez la vôtre</a> ou <a href="?r=/structures">rejoignez-en une</a>.</p>
+</section>
+<?php endif; ?>
+
 <?php if ($artistProfile !== null): ?>
 <section class="section">
     <h2>Ma page artiste</h2>

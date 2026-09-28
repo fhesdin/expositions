@@ -27,6 +27,7 @@ final class ModerationController
             'claims' => (int) Database::run('SELECT COUNT(*) FROM claims WHERE status = "pending"')->fetchColumn(),
             'reports' => (int) Database::run('SELECT COUNT(*) FROM reports WHERE status = "open"')->fetchColumn(),
             'suggestions' => (int) Database::run('SELECT COUNT(*) FROM suggestions WHERE status = "open"')->fetchColumn(),
+            'structures' => (int) Database::run('SELECT COUNT(*) FROM structures WHERE status = "pending"')->fetchColumn(),
         ];
 
         $exhibitions = Database::run(
@@ -64,6 +65,7 @@ final class ModerationController
         $suggestions = Database::run(
             'SELECT * FROM suggestions WHERE status = "open" ORDER BY created_at ASC LIMIT 50'
         )->fetchAll();
+        $structures = \App\Models\StructureModel::listPending();
 
         View::render('moderation/queue', [
             'title' => 'Modération',
@@ -73,6 +75,7 @@ final class ModerationController
             'artists' => $artists,
             'claims' => $claims,
             'reports' => $reports,
+            'structures' => $structures,
             'suggestions' => $suggestions,
             'journal' => ModLog::recent(20),
         ]);
@@ -223,6 +226,35 @@ final class ModerationController
         Database::run('UPDATE suggestions SET status = ?, moderator_id = ? WHERE id = ?', [$action === 'dismiss' ? 'dismissed' : 'resolved', Auth::id(), $id]);
         ModLog::log('suggestion.' . $action, 'suggestion', $id);
         Session::flash('success', 'Suggestion traitée.');
+        Response::redirect('/moderation');
+    }
+
+    public function approveStructure(array $params = []): void
+    {
+        if (!Csrf::check()) {
+            Response::forbidden('Jeton CSRF invalide.');
+        }
+        $id = (int) ($params['id'] ?? 0);
+        $action = (string) Request::input('action', 'approve');
+        if ($action === 'reject') {
+            \App\Models\StructureModel::setStatus($id, 'archived');
+            ModLog::log('structure.reject', 'structure', $id);
+            Session::flash('info', 'Structure refusée.');
+        } else {
+            $row = \App\Models\StructureModel::find($id);
+            \App\Models\StructureModel::setStatus($id, 'published');
+            // le créateur devient admin de la structure (si pas déjà)
+            if ($row && !empty($row['created_by'])) {
+                Database::run(
+                    'INSERT INTO structure_members (structure_id, user_id, role, status, requested_by, joined_at)
+                     VALUES (?,?,"admin","active","user",NOW())
+                     ON DUPLICATE KEY UPDATE role = IF(role="admin", role, role)',
+                    [$id, (int) $row['created_by']]
+                );
+            }
+            ModLog::log('structure.approve', 'structure', $id);
+            Session::flash('success', 'Structure publiée.');
+        }
         Response::redirect('/moderation');
     }
 

@@ -64,6 +64,7 @@ final class PlaceController
         View::render('places/show', [
             'title' => $row['name'],
             'place' => $row,
+            'structure' => !empty($row['structure_id']) ? \App\Models\StructureModel::find((int) $row['structure_id']) : null,
             'managers' => PlaceModel::managers((int) $row['id']),
             'ongoing' => $ongoing,
             'upcoming' => $upcoming,

@@ -52,9 +52,14 @@ final class ExhibitionController
 
         $artistIds = array_map(fn($a) => (int) ($a['artist_id'] ?? 0), ExhibitionModel::artists((int) $row['id']));
 
+        $structure = !empty($row['structure_id'])
+            ? \App\Models\StructureModel::find((int) $row['structure_id'])
+            : null;
+
         View::render('expositions/show', [
             'title' => $row['title'],
             'expo' => $row,
+            'structure' => $structure,
             'poster' => !empty($row['poster_path']) ? '/uploads/expositions/' . $row['poster_path'] : null,
             'artists' => ExhibitionModel::artists((int) $row['id']),
             'tags' => ExhibitionModel::tags((int) $row['id']),
@@ -209,6 +214,7 @@ final class ExhibitionController
             'errors' => [],
             'communes' => \App\Models\Commune::allOrdered(),
             'places' => \App\Places\PlaceModel::directory(),
+            'myStructures' => Auth::id() ? \App\Models\StructureModel::ofUser(Auth::id()) : [],
             'categories' => \App\Models\Category::allActive(),
         ]);
     }
@@ -222,6 +228,7 @@ final class ExhibitionController
         $form = [
             'title' => trim((string) Request::input('title')),
             'place_id' => (int) Request::input('place_id'),
+            'structure_id' => (int) Request::input('structure_id'),
             'commune' => trim((string) Request::input('commune')),
             'd1' => (string) Request::input('d1'),
             'd2' => (string) Request::input('d2'),
@@ -244,6 +251,7 @@ final class ExhibitionController
                 'form' => $form, 'errors' => $errors,
                 'communes' => \App\Models\Commune::allOrdered(),
                 'places' => \App\Places\PlaceModel::directory(),
+            'myStructures' => Auth::id() ? \App\Models\StructureModel::ofUser(Auth::id()) : [],
                 'categories' => \App\Models\Category::allActive(),
             ]);
             return;
@@ -376,6 +384,7 @@ final class ExhibitionController
             'categories' => \App\Models\Category::allActive(),
             'communes' => \App\Models\Commune::allOrdered(),
             'places' => \App\Places\PlaceModel::directory(),
+            'myStructures' => Auth::id() ? \App\Models\StructureModel::ofUser(Auth::id()) : [],
             'tags' => \App\Models\Tag::all(),
         ]);
     }
@@ -433,6 +442,7 @@ final class ExhibitionController
             'languages' => trim((string) Request::input('languages')),
             'category_id' => (int) Request::input('category_id') ?: null,
             'label_id' => (int) Request::input('label_id') ?: null,
+            'structure_id' => (int) Request::input('structure_id') ?: null,
             'poster_credit' => trim((string) Request::input('poster_credit')),
         ];
 
@@ -490,6 +500,7 @@ final class ExhibitionController
             'title' => $data['title'],
             'slug' => $data['slug'],
             'place_id' => $data['place_id'],
+            'structure_id' => !empty($data['structure_id']) ? (int) $data['structure_id'] : null,
             'commune_id' => $data['commune_id'] ?? ($data['place_id'] ? \Core\Database::run('SELECT commune_id FROM places WHERE id = ?', [$data['place_id']])->fetchColumn() ?: null : null),
             'summary' => $data['summary'],
             'description' => $data['description'] ?: null,

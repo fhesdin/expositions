@@ -93,6 +93,22 @@ $mc = fn(array $a) => '<form method="post" class="mod-actions" action="' . e($a[
 </section>
 
 <section class="mod-section">
+    <h2>🏛️ Structures (<?= count($structures) ?>)</h2>
+    <?php foreach (($structures ?? []) as $st): ?>
+        <div class="mod-card">
+            <div class="title"><?= e($st['nom']) ?> <span class="muted small"><?= e(\App\Models\StructureModel::TYPES[$st['type']] ?? $st['type']) ?><?= $st['commune_name'] ? ' · ' . e($st['commune_name']) : '' ?></span></div>
+            <div class="meta"><?= nl2br(e($st['description'] ?: '')) ?></div>
+            <div class="meta muted small">créée par <?= e($st['creator'] ?? '?') ?> — <a href="?r=/structures/<?= e($st['slug']) ?>">aperçu</a></div>
+            <div class="mod-actions">
+                <?= $mc(['action' => '?r=/moderation/structures/' . (int) $st['id'] . '/resolve', 'label' => 'Publier', 'class' => 'btn-primary']) ?>
+                <?= $mc(['action' => '?r=/moderation/structures/' . (int) $st['id'] . '/resolve', 'label' => 'Refuser', 'class' => 'btn-danger', 'hidden' => ['<input type="hidden" name="action" value="reject">']]) ?>
+            </div>
+        </div>
+    <?php endforeach; ?>
+    <?php if (($structures ?? []) === []): ?><p class="muted small">Aucune structure en attente.</p><?php endif; ?>
+</section>
+
+<section class="mod-section">
     <h2>💡 Suggestions (<?= count($suggestions) ?>)</h2>
     <?php foreach ($suggestions as $s): ?>
         <div class="mod-card">

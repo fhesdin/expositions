@@ -24,12 +24,14 @@ final class DashboardController
 
         $managedPlaces = \App\Places\PlaceModel::managedBy($userId);
         $artistProfile = \App\Artists\ArtistModel::forUser($userId);
+        $myStructures = \App\Models\StructureModel::ofUser($userId);
 
         View::render('auth/dashboard', [
             'title' => 'Mon espace',
             'expos' => $expos,
             'managedPlaces' => $managedPlaces,
             'artistProfile' => $artistProfile,
+            'myStructures' => $myStructures,
             'agenda' => \App\Community\AgendaModel::forUser($userId),
             'favorites' => \App\Community\FavoriteModel::forUser($userId),
             'icalUrl' => \App\Community\IcalController::agendaUrl($userId),

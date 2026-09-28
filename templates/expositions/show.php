@@ -23,6 +23,9 @@ $visits = $visitCounts ?? ['going' => 0, 'went' => 0];
 
         <div class="detail-info">
             <h1><?= e($expo['title']) ?></h1>
+            <?php if (!empty($structure) && !empty($structure['status']) && $structure['status'] === 'published'): ?>
+            <p class="small">Organisée par <a href="?r=/structures/<?= e($structure['slug']) ?>"><b><?= e($structure['nom']) ?></b></a></p>
+            <?php endif; ?>
             <p class="dates"><?= e(\App\Expositions\ExhibitionModel::datesHuman($expo)) ?></p>
             <p class="lieu">
                 <?php if ($placeUrl): ?><a href="<?= $placeUrl ?>">📍 <?= e($expo['place_name'] ?? '') ?></a><?php else: ?>📍 <?= e($expo['place_name'] ?? 'Lieu à préciser') ?><?php endif; ?>

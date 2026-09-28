@@ -24,6 +24,19 @@ return function (Router $r): void {
     $r->get('/carte/data.json', [HomeController::class, 'mapData'], 'map.data');
     $r->get('/carte', [\App\Expositions\MapController::class, 'index'], 'map');
     $r->get('/page/{slug}', [\App\PagesController::class, 'show'], 'page');
+
+    // --- Structures ---
+    $r->get('/structures', [\App\StructureController::class, 'index'], 'structures');
+    $r->get('/structures/create', [\App\StructureController::class, 'create'], 'structures.create');
+    $r->post('/structures/create', [\App\StructureController::class, 'store'], 'structures.store');
+    $r->get('/structures/{id}/edit', [\App\StructureController::class, 'edit'], 'structures.edit');
+    $r->post('/structures/{id}/edit', [\App\StructureController::class, 'update'], 'structures.update');
+    $r->get('/structures/{id}/members', [\App\StructureController::class, 'members'], 'structures.members');
+    $r->post('/structures/{id}/members/{uid}', [\App\StructureController::class, 'memberAction'], 'structures.member');
+    $r->post('/structures/{id}/invite', [\App\StructureController::class, 'invite'], 'structures.invite');
+    $r->post('/structures/join', [\App\StructureController::class, 'join'], 'structures.join');
+    $r->post('/structures/leave', [\App\StructureController::class, 'leave'], 'structures.leave');
+    $r->get('/structures/{slug}', [\App\StructureController::class, 'show'], 'structures.show');
     $r->get('/calendrier', [CalendarController::class, 'month'], 'calendar');
 
     // --- Authentification ---
@@ -85,6 +98,7 @@ return function (Router $r): void {
     $r->post('/moderation/claims/{id}/approve', [ModerationController::class, 'approveClaim'])->middleware('moderator');
     $r->post('/moderation/claims/{id}/reject', [ModerationController::class, 'rejectClaim'])->middleware('moderator');
     $r->post('/moderation/suggestions/{id}/resolve', [ModerationController::class, 'resolveSuggestion'])->middleware('moderator');
+    $r->post('/moderation/structures/{id}/resolve', [ModerationController::class, 'approveStructure'])->middleware('moderator');
     $r->post('/moderation/reports/{id}/resolve', [ModerationController::class, 'resolveReport'])->middleware('moderator');
 
     // --- Communauté ---

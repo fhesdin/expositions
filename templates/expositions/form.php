@@ -71,6 +71,16 @@ $ferr = fn(string $k) => !empty($errors[$k]) ? '<div class="field-error">' . e($
                 <input id="place_free_text" type="text" name="place_free_text" value="<?= e($form['place_free_text'] ?? '') ?>">
             </div>
             <div class="field">
+                <label for="structure_id">Organisée par (structure)</label>
+                <select id="structure_id" name="structure_id">
+                    <option value="">— aucune / indépendante —</option>
+                    <?php foreach (($myStructures ?? []) as $st): ?>
+                        <option value="<?= (int) $st['id'] ?>" <?= (string)($form['structure_id'] ?? '') === (string)$st['id'] ? 'selected' : '' ?>><?= e($st['nom']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <div class="hint">Seules vos structures (membre +) apparaissent. <a href="?r=/structures/create" target="_blank">Créer une structure</a>.</div>
+            </div>
+            <div class="field">
                 <label for="commune_id">Commune *</label>
                 <select id="commune_id" name="commune_id" required>
                     <option value="">— choisir —</option>

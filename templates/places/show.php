@@ -6,6 +6,7 @@ $canManage = \Core\Auth::check() && (\Core\Auth::isModerator() || \App\Places\Pl
     <h1><?= e($place['name']) ?></h1>
     <p class="sub">
         <?= e($place['type_name'] ?? '') ?> · <?= e($place['address'] ?? '') ?>, <?= e($place['commune_name'] ?? '') ?>
+<?php if (!empty($structure)): ?> · <a href="?r=/structures/<?= e($structure['slug']) ?>"><?= e($structure['nom']) ?></a><?php endif; ?>
         <?php if ($place['access_pmr']): ?><span class="badge">♿ PMR</span><?php endif; ?>
     </p>
 </div>
