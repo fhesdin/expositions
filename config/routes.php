@@ -121,6 +121,9 @@ return function (Router $r): void {
     $r->post('/admin/taxonomy/categories/{id}', [AdminController::class, 'categoryUpdate'])->middleware('admin');
     $r->post('/admin/taxonomy/tags/merge', [AdminController::class, 'tagMerge'])->middleware('admin');
     $r->post('/admin/taxonomy/tags/{id}/approve', [AdminController::class, 'tagApprove'])->middleware('admin');
+    $r->post('/admin/taxonomy/disciplines/create', [AdminController::class, 'disciplineStore'])->middleware('admin');
+    $r->post('/admin/taxonomy/disciplines/{id}/edit', [AdminController::class, 'disciplineUpdate'])->middleware('admin');
+    $r->post('/admin/taxonomy/disciplines/{id}/delete', [AdminController::class, 'disciplineDelete'])->middleware('admin');
     $r->post('/admin/taxonomy/tags/create', [AdminController::class, 'tagStore'])->middleware('admin');
     $r->post('/admin/taxonomy/tags/{id}/edit', [AdminController::class, 'tagUpdate'])->middleware('admin');
     $r->post('/admin/taxonomy/tags/{id}/delete', [AdminController::class, 'tagDelete'])->middleware('admin');

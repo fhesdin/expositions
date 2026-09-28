@@ -13,7 +13,16 @@ $ferr = fn(string $k) => !empty($errors[$k]) ? '<div class="field-error">' . e($
         </div>
         <div class="field">
             <label>Disciplines</label>
-            <input type="text" name="disciplines" value="<?= e($form['disciplines'] ?? '') ?>" placeholder="peinture, photographie…">
+            <div style="display:flex;flex-wrap:wrap;gap:.35rem 1rem">
+                <?php foreach (($disciplines ?? []) as $d): ?>
+                <label class="check">
+                    <input type="checkbox" name="discipline_ids[]" value="<?= (int) $d['id'] ?>"
+                        <?= in_array((int) $d['id'], array_map('intval', array_column($selectedDisciplines ?? [], 'id')), true) ? 'checked' : '' ?>>
+                    <?= e($d['name']) ?>
+                </label>
+                <?php endforeach; ?>
+            </div>
+            <div class="hint">Liste établie par l'équipe du site.</div>
         </div>
         <div class="field">
             <label>Commune d'atelier</label>

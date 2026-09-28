@@ -120,6 +120,50 @@ final class AdminController
 
     // ------------------------------------------------------------ taxonomie
 
+    public function disciplineStore(array $params = []): void
+    {
+        if (!Csrf::check()) {
+            Response::forbidden('Jeton CSRF invalide.');
+        }
+        $name = trim((string) Request::input('name'));
+        if ($name !== '') {
+            Database::run('INSERT IGNORE INTO disciplines (slug, name) VALUES (?, ?)', [slugify($name), $name]);
+            ModLog::log('create', 'discipline', null, $name);
+            Session::flash('success', 'Discipline ajoutée.');
+        }
+        Response::redirect('/admin/taxonomy');
+    }
+
+    public function disciplineUpdate(array $params = []): void
+    {
+        if (!Csrf::check()) {
+            Response::forbidden('Jeton CSRF invalide.');
+        }
+        $id = (int) ($params['id'] ?? 0);
+        $name = trim((string) Request::input('name'));
+        if ($name !== '' && $id > 0) {
+            Database::run('UPDATE disciplines SET name = ?, slug = ? WHERE id = ?', [$name, slugify($name), $id]);
+            ModLog::log('update', 'discipline', $id, $name);
+            Session::flash('success', 'Discipline mise à jour.');
+        }
+        Response::redirect('/admin/taxonomy');
+    }
+
+    public function disciplineDelete(array $params = []): void
+    {
+        if (!Csrf::check()) {
+            Response::forbidden('Jeton CSRF invalide.');
+        }
+        $id = (int) ($params['id'] ?? 0);
+        if ($id > 0) {
+            Database::run('DELETE FROM artist_disciplines WHERE discipline_id = ?', [$id]);
+            Database::run('DELETE FROM disciplines WHERE id = ?', [$id]);
+            ModLog::log('delete', 'discipline', $id);
+            Session::flash('success', 'Discipline supprimée.');
+        }
+        Response::redirect('/admin/taxonomy');
+    }
+
     public function taxonomy(array $params = []): void
     {
         View::render('admin/taxonomy', [
@@ -128,6 +172,7 @@ final class AdminController
             'tags' => Database::run('SELECT t.*, (SELECT COUNT(*) FROM exhibition_tags et WHERE et.tag_id = t.id) AS used FROM tags t ORDER BY t.name')->fetchAll(),
             'placeTypes' => Database::run('SELECT * FROM place_types ORDER BY name')->fetchAll(),
             'publics' => Database::run('SELECT * FROM publics ORDER BY id')->fetchAll(),
+            'disciplines' => Database::run('SELECT d.*, (SELECT COUNT(*) FROM artist_disciplines ad WHERE ad.discipline_id = d.id) AS used FROM disciplines d ORDER BY d.name')->fetchAll(),
         ]);
     }
 

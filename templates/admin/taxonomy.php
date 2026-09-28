@@ -82,6 +82,29 @@
 </section>
 
 <section class="section">
+    <h2>Disciplines artistiques</h2>
+    <p class="small muted">Choisies par les artistes sous forme de cases à cocher sur leur fiche (pas de saisie libre).</p>
+    <form method="post" action="?r=/admin/taxonomy/disciplines/create" class="filter-bar" style="gap:.5rem">
+        <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
+        <div><input type="text" name="name" required placeholder="Nouvelle discipline (ex. Vitrail)"></div>
+        <button class="btn btn-primary btn-sm" type="submit">Ajouter</button>
+    </form>
+    <div class="mt">
+        <?php foreach (($disciplines ?? []) as $d): ?>
+        <form method="post" action="?r=/admin/taxonomy/disciplines/<?= (int) $d['id'] ?>/edit" style="display:inline-flex;gap:.25rem;margin:.15rem">
+            <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
+            <input type="text" name="name" value="<?= e($d['name']) ?>" size="14">
+            <button class="btn btn-sm btn-outline" type="submit" title="<?= (int) $d['used'] ?> artiste(s)">✎</button>
+        </form>
+        <form method="post" action="?r=/admin/taxonomy/disciplines/<?= (int) $d['id'] ?>/delete" style="display:inline;margin:.15rem .5rem 0 0" onsubmit="return confirm('Supprimer « <?= e($d['name']) ?> » ? (<?= (int) $d['used'] ?> artiste(s))')">
+            <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
+            <button class="btn btn-sm btn-danger" type="submit">×</button>
+        </form>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<section class="section">
     <h2>Types de lieux &amp; publics</h2>
     <div class="grid cols-2">
         <div class="card"><div class="body">
@@ -90,7 +113,7 @@
         </div></div>
         <div class="card"><div class="body">
             <h3>Publics</h3>
-            <?php foreach ($publics as $p): ?><span class="tag-chip"><?= e($p['label']) ?></span><?php endforeach; ?>
+            <?php foreach ($publics as $p): ?><span class="tag-chip"><?= e($p['label'] ?? $p['name'] ?? '') ?></span><?php endforeach; ?>
         </div></div>
     </div>
 </section>

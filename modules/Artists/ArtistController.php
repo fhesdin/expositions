@@ -38,6 +38,7 @@ final class ArtistController
         View::render('artists/show', [
             'title' => $row['name'],
             'artist' => $row,
+            'disciplineNames' => ArtistModel::disciplineNames((int) $row['id']),
             'works' => ArtistModel::works((int) $row['id']),
             'expos' => [
                 'ongoing' => $this->exposFor((int) $row['id'], 'ongoing'),
@@ -158,6 +159,8 @@ final class ArtistController
             'form' => $data ?: $row ?: [],
             'errors' => $errors,
             'communes' => \App\Models\Commune::allOrdered(),
+            'disciplines' => ArtistModel::disciplinesAll(),
+            'selectedDisciplines' => $row ? ArtistModel::disciplinesOf((int) $row['id']) : [],
         ]);
     }
 
@@ -170,7 +173,7 @@ final class ArtistController
         }
         $data = [
             'name' => $name,
-            'disciplines' => trim((string) Request::input('disciplines')),
+            '_discipline_ids' => array_values(array_filter(array_map('intval', (array) Request::input('discipline_ids', [])))),
             'commune_id' => (int) Request::input('commune_id') ?: null,
             'bio' => trim((string) Request::input('bio')),
             'statement' => trim((string) Request::input('statement')),
@@ -188,7 +191,6 @@ final class ArtistController
         $row = [
             'name' => $data['name'],
             'slug' => $data['slug'],
-            'disciplines' => $data['disciplines'] ?: null,
             'commune_id' => $data['commune_id'],
             'bio' => $data['bio'] ?: null,
             'statement' => $data['statement'] ?: null,
@@ -206,6 +208,11 @@ final class ArtistController
             $current = ArtistModel::find($id);
             $row['status'] = ($current['status'] === 'published' && !Auth::isTrusted()) ? 'pending' : $status;
             ArtistModel::update($id, $row);
+        }
+        // disciplines (tags administrés)
+        Database::run('DELETE FROM artist_disciplines WHERE artist_id = ?', [$id]);
+        foreach ($data['_discipline_ids'] as $did) {
+            Database::run('INSERT IGNORE INTO artist_disciplines (artist_id, discipline_id) VALUES (?, ?)', [$id, (int) $did]);
         }
         return $id;
     }

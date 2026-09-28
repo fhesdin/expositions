@@ -23,7 +23,8 @@ class ArtistModel extends Model
     public static function bySlug(string $slug): ?array
     {
         $row = Database::run(
-            'SELECT a.*, c.nom AS commune_name
+            'SELECT a.*, c.nom AS commune_name,
+                    (a.user_id IS NOT NULL AND EXISTS (SELECT 1 FROM users u WHERE u.id = a.user_id AND u.artist_verified = 1)) AS artist_verified
              FROM artists a LEFT JOIN communes c ON c.id = a.commune_id
              WHERE a.slug = ? LIMIT 1',
             [$slug]
@@ -37,9 +38,29 @@ class ArtistModel extends Model
         return $row === false ? null : $row;
     }
 
+    public static function disciplinesAll(): array
+    {
+        return Database::run('SELECT id, name FROM disciplines ORDER BY name')->fetchAll();
+    }
+
+    public static function disciplinesOf(int $artistId): array
+    {
+        return Database::run(
+            'SELECT d.id, d.name, d.slug FROM artist_disciplines ad JOIN disciplines d ON d.id = ad.discipline_id WHERE ad.artist_id = ? ORDER BY d.name',
+            [$artistId]
+        )->fetchAll();
+    }
+
+    public static function disciplineNames(int $artistId): array
+    {
+        return array_column(self::disciplinesOf($artistId), 'name');
+    }
+
     public static function directory(array $filters = []): array
     {
-        $sql = 'SELECT a.*, c.nom AS commune_name
+        $sql = 'SELECT a.*, c.nom AS commune_name,
+                       (a.user_id IS NOT NULL AND EXISTS (SELECT 1 FROM users u WHERE u.id = a.user_id AND u.artist_verified = 1)) AS artist_verified,
+                       (SELECT GROUP_CONCAT(d.name ORDER BY d.name SEPARATOR ", ") FROM artist_disciplines ad JOIN disciplines d ON d.id = ad.discipline_id WHERE ad.artist_id = a.id) AS disciplines
                 FROM artists a LEFT JOIN communes c ON c.id = a.commune_id
                 WHERE a.status = "published"';
         $params = [];
@@ -48,7 +69,7 @@ class ArtistModel extends Model
             $params[] = (int) $filters['commune'];
         }
         if (!empty($filters['q'])) {
-            $sql .= ' AND (a.name LIKE ? OR a.disciplines LIKE ? OR a.bio LIKE ?)';
+            $sql .= ' AND (a.name LIKE ? OR a.bio LIKE ? OR EXISTS (SELECT 1 FROM artist_disciplines ad2 JOIN disciplines d2 ON d2.id = ad2.discipline_id WHERE ad2.artist_id = a.id AND d2.name LIKE ?))';
             $q = '%' . $filters['q'] . '%';
             array_push($params, $q, $q, $q);
         }
