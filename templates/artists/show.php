@@ -2,7 +2,11 @@
 $canEdit = \Core\Auth::check() && (\Core\Auth::isModerator() || (int) ($artist['user_id'] ?? 0) === \Core\Auth::id());
 ?>
 <div class="page-head small"><a href="?r=/artistes">← Tous les artistes</a></div>
-<div class="page-head">
+<div class="page-head" style="display:flex;align-items:center;gap:1rem">
+    <?php if (!empty($artist['image_path'])): ?>
+    <img src="/uploads/artists/<?= e($artist['image_path']) ?>" alt="Photo de <?= e($artist['name']) ?>" style="width:88px;height:88px;object-fit:cover;border-radius:50%">
+    <?php endif; ?>
+    <div>
     <h1><?= e($artist['name']) ?></h1>
     <p class="sub">
         <?= e(implode(', ', $disciplineNames ?? [])) ?>
@@ -10,6 +14,7 @@ $canEdit = \Core\Auth::check() && (\Core\Auth::isModerator() || (int) ($artist['
         <?php if ($artist['artist_verified']): ?><span class="badge encours">✓ Page vérifiée</span><?php endif; ?>
         <?php if ($artist['workshop_open']): ?><span class="badge gratuit">Atelier ouvert au public</span><?php endif; ?>
     </p>
+    </div>
 </div>
 
 <?php if (!empty($artist['bio'])): ?>

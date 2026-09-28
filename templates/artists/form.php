@@ -2,7 +2,7 @@
 $isEdit = $row !== null;
 $ferr = fn(string $k) => !empty($errors[$k]) ? '<div class="field-error">' . e($errors[$k]) . '</div>' : '';
 ?>
-<form method="post" class="form-card" action="<?= $isEdit ? '?r=/artistes/' . (int) $row['id'] . '/edit' : '?r=/artistes/create' ?>">
+<form method="post" enctype="multipart/form-data" class="form-card" action="<?= $isEdit ? '?r=/artistes/' . (int) $row['id'] . '/edit' : '?r=/artistes/create' ?>">
     <input type="hidden" name="_csrf" value="<?= e(\Core\Csrf::token()) ?>">
     <input type="hidden" name="current_slug" value="<?= e($row['slug'] ?? '') ?>">
     <div class="form-grid cols-2">
@@ -23,6 +23,13 @@ $ferr = fn(string $k) => !empty($errors[$k]) ? '<div class="field-error">' . e($
                 <?php endforeach; ?>
             </div>
             <div class="hint">Liste établie par l'équipe du site.</div>
+        </div>
+        <div class="field">
+            <label>Photo / portrait (PNG/JPG, 3 Mo max)</label>
+            <input type="file" name="photo" accept="image/png,image/jpeg">
+            <?php if (!empty($row['image_path'])): ?>
+            <div class="hint"><img src="/uploads/artists/<?= e($row['image_path']) ?>" alt="Photo actuelle" style="width:64px;height:64px;object-fit:cover;border-radius:50%"> Remplacer par un nouveau fichier, ou laisser vide.</div>
+            <?php endif; ?>
         </div>
         <div class="field">
             <label>Commune d'atelier</label>

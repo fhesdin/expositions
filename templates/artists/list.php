@@ -26,8 +26,12 @@
     <div class="grid cols-3">
         <?php foreach ($rows as $a): ?>
         <article class="card">
-            <div class="body">
-                <h3><a href="?r=/artistes/<?= e($a['slug']) ?>"><?= e($a['name']) ?></a></h3>
+            <div class="body" style="display:flex;gap:.75rem;align-items:center">
+                <?php if (!empty($a['image_path'])): ?>
+                <img src="/uploads/artists/<?= e($a['image_path']) ?>" alt="" style="width:52px;height:52px;object-fit:cover;border-radius:50%;flex:none">
+                <?php endif; ?>
+                <div>
+                <h3 style="margin:0"><a href="?r=/artistes/<?= e($a['slug']) ?>"><?= e($a['name']) ?></a></h3>
                 <div class="meta">
                     <?php if (!empty($a['disciplines'])): ?><span><?= e($a['disciplines']) ?></span><?php endif; ?>
                     <?php if (!empty($a['commune_name'])): ?><span>📍 <?= e($a['commune_name']) ?></span><?php endif; ?>
@@ -35,6 +39,7 @@
                 <div class="badges">
                     <?php if (!empty($a['artist_verified'])): ?><span class="badge encours">✓ Page vérifiée</span><?php endif; ?>
                     <?php if ($a['workshop_open']): ?><span class="badge gratuit">Atelier ouvert au public</span><?php endif; ?>
+                </div>
                 </div>
             </div>
         </article>
