@@ -30,8 +30,8 @@ $pendingCount = ($currentUser !== null && \Core\Auth::isModerator())
     <?php endif; ?>
     <link rel="stylesheet" href="css/style.css">
     <?php if (!empty($leaflet)): ?>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="assets/leaflet/leaflet.css">
+    <script src="assets/leaflet/leaflet.js"></script>
     <?php endif; ?>
 </head>
 <body>
