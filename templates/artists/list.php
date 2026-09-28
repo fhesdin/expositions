@@ -33,12 +33,11 @@
                     <?php if (!empty($a['commune_name'])): ?><span>📍 <?= e($a['commune_name']) ?></span><?php endif; ?>
                 </div>
                 <div class="badges">
-                    <?php if ($a['artist_verified']): ?><span class="badge encours">✓ Page vérifiée</span><?php endif; ?>
+                    <?php if (!empty($a['artist_verified'])): ?><span class="badge encours">✓ Page vérifiée</span><?php endif; ?>
                     <?php if ($a['workshop_open']): ?><span class="badge gratuit">Atelier ouvert au public</span><?php endif; ?>
                 </div>
             </div>
         </article>
         <?php endforeach; ?>
     </div>
-    <div class="mt"><?= $pagination->render('?r=/artistes&' . http_build_query(array_filter($filters, fn($v) => $v !== '' && $v !== null))) ?></div>
 <?php endif; ?>
