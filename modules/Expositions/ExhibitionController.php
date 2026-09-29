@@ -385,6 +385,8 @@ final class ExhibitionController
             'communes' => \App\Models\Commune::allOrdered(),
             'places' => \App\Places\PlaceModel::directory(),
             'myStructures' => Auth::id() ? \App\Models\StructureModel::ofUser(Auth::id()) : [],
+            'allArtists' => \App\Artists\ArtistModel::directory(),
+            'selectedArtists' => $row ? array_map('intval', array_column(ExhibitionModel::artists((int) $row['id']), 'artist_id')) : [],
             'tags' => \App\Models\Tag::all(),
         ]);
     }
