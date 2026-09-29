@@ -31,6 +31,9 @@ $visits = $visitCounts ?? ['going' => 0, 'went' => 0];
                 <?php if ($placeUrl): ?><a href="<?= $placeUrl ?>">📍 <?= e($expo['place_name'] ?? '') ?></a><?php else: ?>📍 <?= e($expo['place_name'] ?? 'Lieu à préciser') ?><?php endif; ?>
                 <?php if (!empty($expo['commune_name'])): ?> — <?= e($expo['commune_name']) ?> (Somme)<?php endif; ?>
             </p>
+            <?php if (!empty($disciplineNames)): ?>
+            <p class="meta" style="margin:.25rem 0 0">🎨 <?= e(implode(' · ', $disciplineNames)) ?></p>
+            <?php endif; ?>
             <div class="badges">
                 <?php if ((int) ($expo['is_permanent'] ?? 0) === 1): ?><span class="badge encours">Permanente</span>
                 <?php elseif (($expo['status'] ?? '') === 'archived'): ?><span class="badge terminee">Archivée</span>

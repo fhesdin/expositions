@@ -62,6 +62,9 @@ final class ExhibitionController
             'structure' => $structure,
             'poster' => !empty($row['poster_path']) ? '/uploads/expositions/' . $row['poster_path'] : null,
             'artists' => ExhibitionModel::artists((int) $row['id']),
+            'disciplineNames' => array_map(fn ($r) => $r['name'], array_values(array_filter(
+                \Core\Database::run('SELECT d.name FROM exhibition_disciplines ed JOIN disciplines d ON d.id = ed.discipline_id WHERE ed.exhibition_id = ? ORDER BY d.name', [(int) $row['id']])->fetchAll()
+            ))),
             'tags' => ExhibitionModel::tags((int) $row['id']),
             'images' => ExhibitionModel::images((int) $row['id']),
             'docs' => ExhibitionModel::docs((int) $row['id']),
@@ -387,6 +390,8 @@ final class ExhibitionController
             'myStructures' => Auth::id() ? \App\Models\StructureModel::ofUser(Auth::id()) : [],
             'allArtists' => \App\Artists\ArtistModel::directory(),
             'selectedArtists' => $row ? array_map('intval', array_column(ExhibitionModel::artists((int) $row['id']), 'artist_id')) : [],
+            'disciplines' => \App\Artists\ArtistModel::disciplinesAll(),
+            'selectedDisciplines' => $row ? array_map('intval', array_column(\Core\Database::run('SELECT discipline_id FROM exhibition_disciplines WHERE exhibition_id = ?', [(int) $row['id']])->fetchAll(), 'discipline_id')) : [],
             'tags' => \App\Models\Tag::all(),
         ]);
     }
@@ -464,6 +469,7 @@ final class ExhibitionController
         $data['_artist_ids'] = array_values(array_filter(array_map('intval', (array) Request::input('artist_ids', []))));
         $data['_free_artists'] = $flatList(Request::input('free_artists', []));
         $data['_tag_ids'] = array_values(array_filter(array_map('intval', (array) Request::input('tag_ids', []))));
+        $data['_discipline_ids'] = array_values(array_filter(array_map('intval', (array) Request::input('discipline_ids', []))));
         $data['_new_tags'] = $flatList(Request::input('new_tags', []));
         $data['_public_ids'] = array_values(array_filter(array_map('intval', (array) Request::input('public_ids', []))));
 
@@ -543,6 +549,10 @@ final class ExhibitionController
             if ($name !== '') {
                 \Core\Database::run('INSERT INTO exhibition_artists (exhibition_id, free_name) VALUES (?, ?)', [$id, $name]);
             }
+        }
+        \Core\Database::run('DELETE FROM exhibition_disciplines WHERE exhibition_id = ?', [$id]);
+        foreach ($data['_discipline_ids'] as $did) {
+            \Core\Database::run('INSERT IGNORE INTO exhibition_disciplines (exhibition_id, discipline_id) VALUES (?, ?)', [$id, (int) $did]);
         }
         \Core\Database::run('DELETE FROM exhibition_tags WHERE exhibition_id = ?', [$id]);
         $tagCount = 0;

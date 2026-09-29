@@ -154,17 +154,32 @@ $ferr = fn(string $k) => !empty($errors[$k]) ? '<div class="field-error">' . e($
     </fieldset>
 
     <fieldset class="form-section">
-        <legend>Artistes exposé(e)s</legend>
-        <?php if (!empty($allArtists)): ?>
-        <div class="form-grid cols-3">
-            <?php foreach ($allArtists as $a): ?>
-                <div class="check">
-                    <input type="checkbox" id="artist_<?= (int) $a['id'] ?>" name="artist_ids[]" value="<?= (int) $a['id'] ?>"
-                        <?= in_array((int) $a['id'], array_map('intval', $selectedArtists ?? []), true) ? 'checked' : '' ?>>
-                    <label for="artist_<?= (int) $a['id'] ?>"><?= e($a['name']) ?></label>
-                </div>
+        <legend>Disciplines</legend>
+        <div style="display:flex;flex-wrap:wrap;gap:.35rem 1rem">
+            <?php foreach (($disciplines ?? []) as $d): ?>
+            <label class="check">
+                <input type="checkbox" name="discipline_ids[]" value="<?= (int) $d['id'] ?>"
+                    <?= in_array((int) $d['id'], array_map('intval', $selectedDisciplines ?? []), true) ? 'checked' : '' ?>>
+                <?= e($d['name']) ?>
+            </label>
             <?php endforeach; ?>
         </div>
+        <div class="hint">Pratiques représentées dans l'exposition (liste établie par l'équipe du site).</div>
+    </fieldset>
+
+    <fieldset class="form-section">
+        <legend>Artistes exposé(e)s</legend>
+        <?php if (!empty($allArtists)): ?>
+        <div style="display:flex;gap:.5rem;max-width:520px">
+            <select id="artist-select" style="flex:1">
+                <option value="">— Choisir un artiste —</option>
+                <?php foreach ($allArtists as $a): ?>
+                <option value="<?= (int) $a['id'] ?>" data-name="<?= e($a['name']) ?>"><?= e($a['name']) ?></option>
+                <?php endforeach; ?>
+            </select>
+            <button class="btn btn-primary btn-sm" type="button" id="artist-add">＋ Ajouter</button>
+        </div>
+        <ul id="artist-list" style="list-style:none;padding:0;margin:.75rem 0 0;display:flex;flex-wrap:wrap;gap:.4rem"></ul>
         <div class="hint">L'artiste manque ? <a href="?r=/artistes/create" target="_blank">Créez sa page</a>.</div>
         <?php else: ?>
             <p class="muted small">Aucun artiste recensé pour l'instant — <a href="?r=/artistes/create">créez le premier</a>.</p>
@@ -191,3 +206,51 @@ $ferr = fn(string $k) => !empty($errors[$k]) ? '<div class="field-error">' . e($
         <?php endif; ?>
     </div>
 </form>
+
+<script>
+(function () {
+    var sel = document.getElementById('artist-select');
+    if (!sel) return;
+    var addBtn = document.getElementById('artist-add');
+    var list = document.getElementById('artist-list');
+    var chosen = {};
+
+    function restore(id, name) {
+        chosen[id] = name;
+        render();
+    }
+    function render() {
+        list.innerHTML = '';
+        Object.keys(chosen).sort(function (a, b) { return chosen[a].localeCompare(chosen[b]); }).forEach(function (id) {
+            var li = document.createElement('li');
+            li.style.cssText = 'background:var(--chip-bg,#efe9e4);border-radius:999px;padding:.3rem .75rem;display:inline-flex;align-items:center;gap:.4rem;font-size:.9rem';
+            li.innerHTML = '<span>' + chosen[id].replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }) + '</span>';
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = '×';
+            btn.style.cssText = 'border:0;background:none;cursor:pointer;font-size:1rem;line-height:1;color:#7a3b2e';
+            btn.onclick = function () { delete chosen[id]; render(); };
+            li.appendChild(btn);
+            var hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'artist_ids[]';
+            hidden.value = id;
+            li.appendChild(hidden);
+            list.appendChild(li);
+        });
+    }
+    addBtn.addEventListener('click', function () {
+        var id = sel.value;
+        if (!id || chosen[id]) { sel.value = ''; return; }
+        restore(id, sel.options[sel.selectedIndex].getAttribute('data-name') || sel.options[sel.selectedIndex].text);
+        sel.value = '';
+    });
+    <?php foreach (($selectedArtists ?? []) as $pre): ?>
+    (function () {
+        var id = '<?= (int) $pre ?>';
+        var opt = sel.querySelector('option[value="' + id + '"]');
+        if (opt) { restore(id, opt.getAttribute('data-name') || opt.text); }
+    })();
+    <?php endforeach; ?>
+})();
+</script>
