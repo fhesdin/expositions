@@ -68,6 +68,10 @@ class ArtistModel extends Model
             $sql .= ' AND a.commune_id = ?';
             $params[] = (int) $filters['commune'];
         }
+        if (!empty($filters['discipline'])) {
+            $sql .= ' AND EXISTS (SELECT 1 FROM artist_disciplines ad3 WHERE ad3.artist_id = a.id AND ad3.discipline_id = ?)';
+            $params[] = (int) $filters['discipline'];
+        }
         if (!empty($filters['q'])) {
             $sql .= ' AND (a.name LIKE ? OR a.bio LIKE ? OR EXISTS (SELECT 1 FROM artist_disciplines ad2 JOIN disciplines d2 ON d2.id = ad2.discipline_id WHERE ad2.artist_id = a.id AND d2.name LIKE ?))';
             $q = '%' . $filters['q'] . '%';

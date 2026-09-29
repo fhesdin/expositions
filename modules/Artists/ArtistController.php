@@ -18,6 +18,7 @@ final class ArtistController
         $filters = [
             'q' => trim((string) Request::query('q', '')),
             'commune' => (string) Request::query('commune', ''),
+            'discipline' => (string) Request::query('discipline', ''),
         ];
         View::render('artists/list', [
             'title' => 'Annuaire des artistes',

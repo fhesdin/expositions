@@ -13,11 +13,25 @@
         <div class="stat-strip">
             <span class="stat"><b><?= (int) $counters['ongoing'] ?></b> expo(s) en cours</span>
             <span class="stat"><b><?= (int) $counters['places'] ?></b> lieux</span>
+            <span class="stat"><b><?= (int) $counters['structures'] ?></b> structures</span>
             <span class="stat"><b><?= (int) $counters['artists'] ?></b> artistes</span>
             <span class="stat"><b><?= (int) $counters['communes'] ?></b> communes</span>
         </div>
     </div>
 </section>
+
+<?php if (!empty($disciplines)): ?>
+<section class="section">
+    <h2>🎨 Explorer par discipline</h2>
+    <div class="chip-cloud" style="display:flex;flex-wrap:wrap;gap:.5rem">
+        <?php foreach ($disciplines as $d): ?>
+        <a class="tag-chip" href="?r=/artistes&amp;discipline=<?= (int) $d['id'] ?>">
+            <?= e($d['name']) ?> <b><?= (int) $d['n'] ?></b>
+        </a>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
 
 <?php if (!empty($featured)): ?>
 <section class="section">

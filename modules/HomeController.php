@@ -24,8 +24,14 @@ final class HomeController
                 'places' => (int) Database::run('SELECT COUNT(*) FROM places WHERE status = "published"')->fetchColumn(),
                 'artists' => (int) Database::run('SELECT COUNT(*) FROM artists WHERE status = "published"')->fetchColumn(),
                 'communes' => (int) Database::run('SELECT COUNT(DISTINCT commune_id) FROM exhibitions WHERE status = "published" AND commune_id IS NOT NULL')->fetchColumn(),
+                'structures' => (int) Database::run('SELECT COUNT(*) FROM structures WHERE status = "published"')->fetchColumn(),
             ],
             'categories' => \App\Models\Category::allActive(),
+            'disciplines' => Database::run(
+                'SELECT d.id, d.name, d.slug,
+                        (SELECT COUNT(*) FROM artist_disciplines ad JOIN artists a ON a.id = ad.artist_id WHERE ad.discipline_id = d.id AND a.status = "published") AS n
+                 FROM disciplines d ORDER BY name'
+            )->fetchAll(),
         ]);
     }
 
